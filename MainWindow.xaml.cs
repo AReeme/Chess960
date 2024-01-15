@@ -603,6 +603,41 @@ namespace Chess
             await CheckComputerMove();
         }
 
+        // Separate New Game Method For Chess 960
+        private async Task NewGame_960()
+        {
+            cancelMoveComputation.Cancel();
+            cancelMoveComputation = new CancellationTokenSource();
+            game = new ChessGame();
+
+            var pieces = new List<Pieces.Piece>
+            {
+                new Rook(new Point(0, 0), true),
+                new Knight(new Point(0, 0), true),
+                new Bishop(new Point(0, 0), true),
+                new Queen(new Point(0, 0), true),
+                new King(new Point(0, 0), true),
+                new Bishop(new Point(0, 0), true),
+                new Knight(new Point(0, 0), true),
+                new Rook(new Point(0, 0), true)
+            };
+
+            pieces.Shuffle();
+            PlacePieces(pieces);
+            EnsureKing();
+            EnsureBishops();
+
+            currentBestMove = null;
+            manuallyEvaluating = false;
+            grabbedPiece = null;
+            highlightGrabbedMoves = false;
+            whiteEvaluation.Content = "?";
+            blackEvaluation.Content = "?";
+            UpdateGameDisplay();
+            UpdateCursor();
+            await CheckComputerMove();
+        }
+
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
             UpdateGameDisplay();
@@ -820,6 +855,14 @@ namespace Chess
             whiteIsComputer = true;
             blackIsComputer = true;
             await NewGame();
+        }
+
+        // New Method for Chess 960 Game Start
+        private async void NewGame_Chess960(object sender, RoutedEventArgs e)
+        {
+            whiteIsComputer = false;
+            blackIsComputer = true;
+            await NewGame_960();
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

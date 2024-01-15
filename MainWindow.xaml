@@ -22,7 +22,7 @@
                 <MenuItem Header="New Game (1 Player - _White)" Click="NewGameCpuWhite_Click"/>
                 <MenuItem Header="New Game (1 Player - _Black)" Click="NewGameCpuBlack_Click"/>
                 <MenuItem Header="New Game (0 Player - _Computer Only)" Click="NewGameCpuOnly_Click"/>
-                <MenuItem Header="New Game (1 Player - Chess 960)"/>
+                <MenuItem Header="New Game (1 Player - Chess 960)" Click="NewGame_Chess960"/>
                 <Separator/>
                 <MenuItem Header="_Undo Move" Click="UndoMove_Click"/>
                 <Separator/>

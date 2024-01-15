@@ -944,5 +944,52 @@ namespace Chess
             }
             config.ExternalEngineBlackDepth = (uint)blackDepthItem.Value;
         }
+
+        //Place Pieces 
+        public void PlacePieces(IEnumerable<Piece> pieces)
+        {
+            int column = 0;
+            foreach (Piece piece in pieces) 
+            {
+                if (piece is Pieces.Pawn) continue;
+                game.Board[column++, 0] = piece;
+            }
+        }
+
+        //Ensures that the King is in between two rooks
+        public void EnsureKing()
+        {
+            var king = game.Board.OfType<Pieces.Piece>().FirstOrDefault(p => p is Pieces.King);
+            var rooks = game.Board.OfType<Pieces.Rook>();
+
+            if (king is null || rooks.Count() != 2) return;
+
+            var rook1 = rooks.First();
+            var rook2 = rooks.Skip(1).First();
+
+            if (Math.Abs(rook1.Position.X - king.Position.X) <= 1 && Math.Abs(rook2.Position.X - king.Position.X) <= 1) return;
+
+            var temp = game.Board[rook1.Position.X, rook1.Position.Y];
+            game.Board[rook1.Position.X, rook1.Position.Y] = king;
+            game.Board[king.Position.X, king.Position.Y] = temp;
+        }
+
+        //Ensures Bishops are on opposite colored squares
+        public void EnsureBishops()
+        {
+            var bishops = game.Board.OfType<Pieces.Bishop>();
+
+            if (bishops.Count() != 2) return;
+
+            var bishop1 = bishops.First();
+            var bishop2 = bishops.Skip(1).First();
+
+            while ((bishop1.Position.X % 2) == (bishop2.Position.X % 2))
+            {
+                var temp = game.Board[bishop1.Position.X, bishop1.Position.Y];
+                game.Board[bishop1.Position.X, bishop1.Position.Y] = game.Board[bishop2.Position.X, bishop2.Position.Y];
+                game.Board[bishop2.Position.X, bishop2.Position.Y] = temp;
+            }
+        }
     }
 }

@@ -1,9 +1,11 @@
 ﻿using Chess.Pieces;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Drawing;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 
 namespace Chess
@@ -122,8 +124,8 @@ namespace Chess
                 };
 
                 pieces.Shuffle();
-                EnsureKing();
-                EnsureBishops();
+                EnsureKing(pieces);
+                EnsureBishops(pieces);
                 PlacePieces(pieces);
             }
 
@@ -163,39 +165,60 @@ namespace Chess
         }
 
         //Ensures that the King is in between two rooks
-        public void EnsureKing()
+        public void EnsureKing(List<String> array)
         {
-            var king = Board.OfType<Pieces.Piece>().FirstOrDefault(p => p is Pieces.King);
-            var rooks = Board.OfType<Pieces.Rook>().Where(r => r.IsWhite == true);
+            var king = array.OfType<String>().FirstOrDefault(p => p is "King");
+            var rooks = array.OfType<String>().Where(r => r is "Rook");
 
             if (king is null || rooks.Count() != 2) return;
 
-            var rook1 = rooks.First();
-            var rook2 = rooks.Skip(1).First();
+            int rook1Index = -1;
+            int rook2Index = -1;
+            int kingIndex = array.IndexOf(king);
 
-            if (Math.Abs(rook1.Position.X - king.Position.X) <= 1 && Math.Abs(rook2.Position.X - king.Position.X) <= 1) return;
+            for (int i = 0; i < array.Count; i++)
+            {
+                if (rook1Index == -1 && array[i] == "Rook") 
+                {
+                    rook1Index = i;
+                    continue;
+                }
+                if (rook2Index == -1 && array[i] == "Rook") rook2Index = i;
+            }
 
-            var temp = Board[rook1.Position.X, rook1.Position.Y];
-            Board[rook1.Position.X, rook1.Position.Y] = king;
-            Board[king.Position.X, king.Position.Y] = temp;
+            if (kingIndex > rook1Index && kingIndex < rook2Index) return;
+
+            if (kingIndex < rook1Index)
+            {
+                var temp = array[rook1Index];
+                array[rook1Index] = array[kingIndex];
+                array[kingIndex] = temp;
+            }
+
+            if (kingIndex > rook2Index)
+            {
+                var temp = array[rook2Index];
+                array[rook2Index] = array[kingIndex];
+                array[kingIndex] = temp;
+            }
         }
 
         //Ensures Bishops are on opposite colored squares
-        public void EnsureBishops()
+        public void EnsureBishops(List<String> array)
         {
-            var bishops = Board.OfType<Pieces.Bishop>();
+            var bishops = array.OfType<String>().Where(r => r is "Bishop");
 
             if (bishops.Count() != 2) return;
 
-            var bishop1 = bishops.First();
-            var bishop2 = bishops.Skip(1).First();
+            //var bishop1 = bishops.First();
+            //var bishop2 = bishops.Skip(1).First();
 
-            while ((bishop1.Position.X % 2) == (bishop2.Position.X % 2))
-            {
-                var temp = Board[bishop1.Position.X, bishop1.Position.Y];
-                Board[bishop1.Position.X, bishop1.Position.Y] = Board[bishop2.Position.X, bishop2.Position.Y];
-                Board[bishop2.Position.X, bishop2.Position.Y] = temp;
-            }
+            //while ((bishop1.Position.X % 2) == (bishop2.Position.X % 2))
+            //{
+            //    var temp = Board[bishop1.Position.X, bishop1.Position.Y];
+            //    Board[bishop1.Position.X, bishop1.Position.Y] = Board[bishop2.Position.X, bishop2.Position.Y];
+            //    Board[bishop2.Position.X, bishop2.Position.Y] = temp;
+            //}
         }
 
         /// <summary>

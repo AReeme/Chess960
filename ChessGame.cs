@@ -142,23 +142,23 @@ namespace Chess
                 if (piece.Equals("Rook"))
                 {
                     Board[column, 0] = new Pieces.Rook(new Point(column, 0), true);
-                    Board[column, 7] = new Pieces.Rook(new Point(column, 7), false);
+                    Board[7 - column, 7] = new Pieces.Rook(new Point(7 - column, 7), false);
                 } else if (piece.Equals("Knight"))
                 {
                     Board[column, 0] = new Pieces.Knight(new Point(column, 0), true);
-                    Board[column, 7] = new Pieces.Knight(new Point(column, 7), false);
+                    Board[7 - column, 7] = new Pieces.Knight(new Point(7 - column, 7), false);
                 } else if (piece.Equals("Bishop"))
                 {
                     Board[column, 0] = new Pieces.Bishop(new Point(column, 0), true);
-                    Board[column, 7] = new Pieces.Bishop(new Point(column, 7), false);
+                    Board[7 - column, 7] = new Pieces.Bishop(new Point(7 - column, 7), false);
                 } else if (piece.Equals("Queen"))
                 {
                     Board[column, 0] = new Pieces.Queen(new Point(column, 0), true);
-                    Board[column, 7] = new Pieces.Queen(new Point(column, 7), false);
+                    Board[7 - column, 7] = new Pieces.Queen(new Point(7 - column, 7), false);
                 } else if (piece.Equals("King"))
                 {
                     Board[column, 0] = new Pieces.King(new Point(column, 0), true);
-                    Board[column, 7] = new Pieces.King(new Point(column, 7), false);
+                    Board[7 - column, 7] = new Pieces.King(new Point(7 - column, 7), false);
                 }
                 column++;
             }
@@ -208,17 +208,25 @@ namespace Chess
         {
             var bishops = array.OfType<String>().Where(r => r is "Bishop");
 
-            if (bishops.Count() != 2) return;
+            int bishop1Index = -1;
+            var bishop2Index = -1;
 
-            //var bishop1 = bishops.First();
-            //var bishop2 = bishops.Skip(1).First();
+            for (int i = 0; i < array.Count; i++)
+            {
+                if (bishop1Index == -1 && array[i] == "Bishop")
+                {
+                    bishop1Index = i;
+                    continue;
+                }
+                if (bishop2Index == -1 && array[i] == "Bishop") bishop2Index = i;
+            }
 
-            //while ((bishop1.Position.X % 2) == (bishop2.Position.X % 2))
-            //{
-            //    var temp = Board[bishop1.Position.X, bishop1.Position.Y];
-            //    Board[bishop1.Position.X, bishop1.Position.Y] = Board[bishop2.Position.X, bishop2.Position.Y];
-            //    Board[bishop2.Position.X, bishop2.Position.Y] = temp;
-            //}
+            if ((bishop1Index % 2) == (bishop2Index % 2))
+            {
+                var temp = array[bishop1Index + 1];
+                array[bishop1Index + 1] = array[bishop2Index];
+                array[bishop2Index] = temp;
+            }
         }
 
         /// <summary>

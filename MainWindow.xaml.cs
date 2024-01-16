@@ -608,31 +608,7 @@ namespace Chess
         {
             cancelMoveComputation.Cancel();
             cancelMoveComputation = new CancellationTokenSource();
-            game = new ChessGame();
-
-            var pieces = new List<Pieces.Piece>
-            {
-                new Rook(new Point(0, 0), true),
-                new Knight(new Point(1, 0), true),
-                new Bishop(new Point(2, 0), true),
-                new Queen(new Point(3, 0), true),
-                new King(new Point(4, 0), true),
-                new Bishop(new Point(5, 0), true),
-                new Knight(new Point(6, 0), true),
-                new Rook(new Point(7, 0), true)
-            };
-
-            for (int i = 0; i < pieces.Count; i++)
-            {
-                pieces[i].IsWhite = true;
-            }
-
-            pieces.Shuffle();
-            PlacePieces(pieces);
-
-            //EnsureKing();
-            //EnsureBishops();
-
+            game = new ChessGame(false);
             currentBestMove = null;
             manuallyEvaluating = false;
             grabbedPiece = null;
@@ -992,54 +968,6 @@ namespace Chess
                 return;
             }
             config.ExternalEngineBlackDepth = (uint)blackDepthItem.Value;
-        }
-
-        //Place Pieces 
-        public void PlacePieces(IEnumerable<Piece> pieces)
-        {
-            int column = 0;
-            foreach (Piece piece in pieces) 
-            {
-                if (piece is Pieces.Pawn) continue;
-                if (column >= 8) break;
-                game.Board[column++, 0] = piece;
-            }
-        }
-
-        //Ensures that the King is in between two rooks
-        public void EnsureKing()
-        {
-            var king = game.Board.OfType<Pieces.Piece>().FirstOrDefault(p => p is Pieces.King);
-            var rooks = game.Board.OfType<Pieces.Rook>().Where(r => r.IsWhite == false);
-
-            if (king is null || rooks.Count() != 2) return;
-
-            var rook1 = rooks.First();
-            var rook2 = rooks.Skip(1).First();
-
-            if (Math.Abs(rook1.Position.X - king.Position.X) <= 1 && Math.Abs(rook2.Position.X - king.Position.X) <= 1) return;
-
-            var temp = game.Board[rook1.Position.X, rook1.Position.Y];
-            game.Board[rook1.Position.X, rook1.Position.Y] = king;
-            game.Board[king.Position.X, king.Position.Y] = temp;
-        }
-
-        //Ensures Bishops are on opposite colored squares
-        public void EnsureBishops()
-        {
-            var bishops = game.Board.OfType<Pieces.Bishop>();
-
-            if (bishops.Count() != 2) return;
-
-            var bishop1 = bishops.First();
-            var bishop2 = bishops.Skip(1).First();
-
-            while ((bishop1.Position.X % 2) == (bishop2.Position.X % 2))
-            {
-                var temp = game.Board[bishop1.Position.X, bishop1.Position.Y];
-                game.Board[bishop1.Position.X, bishop1.Position.Y] = game.Board[bishop2.Position.X, bishop2.Position.Y];
-                game.Board[bishop2.Position.X, bishop2.Position.Y] = temp;
-            }
         }
     }
 }

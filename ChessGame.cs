@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Chess.Pieces;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Drawing;
@@ -68,7 +69,7 @@ namespace Chess
         /// <summary>
         /// Create a new standard chess game with all values at their defaults
         /// </summary>
-        public ChessGame()
+        public ChessGame(bool isDefault = true)
         {
             CurrentTurnWhite = true;
             GameOver = false;
@@ -102,7 +103,99 @@ namespace Chess
                 { new Pieces.Rook(new Point(7, 0), true), new Pieces.Pawn(new Point(7, 1), true), null, null, null, null, new Pieces.Pawn(new Point(7, 6), false), new Pieces.Rook(new Point(7, 7), false) }
             };
 
+            if (!isDefault)
+            {
+                WhiteMayCastleKingside = false;
+                WhiteMayCastleQueenside = false;
+                BlackMayCastleKingside = false;
+                BlackMayCastleQueenside = false;
+                var pieces = new List<String>
+                {
+                    "Rook", //new Rook(new Point(0, 0), true),
+                    "Knight", //new Knight(new Point(0, 0), true),
+                    "Bishop", //new Bishop(new Point(0, 0), true),
+                    "Queen", //new Queen(new Point(0, 0), true),
+                    "King", //new King(new Point(0, 0), true),
+                    "Bishop", //new Bishop(new Point(0, 0), true),
+                    "Knight", //new Knight(new Point(0, 0), true),
+                    "Rook" //new Rook(new Point(0, 0), true)
+                };
+
+                pieces.Shuffle();
+                EnsureKing();
+                EnsureBishops();
+                PlacePieces(pieces);
+            }
+
+
             InitialState = ToString();
+        }
+
+        //Place Pieces 
+        public void PlacePieces(IEnumerable<string> pieces)
+        {
+            int column = 0;
+            foreach (string piece in pieces)
+            {
+                if (piece.Equals("Rook"))
+                {
+                    Board[column, 0] = new Pieces.Rook(new Point(column, 0), true);
+                    Board[column, 7] = new Pieces.Rook(new Point(column, 7), false);
+                } else if (piece.Equals("Knight"))
+                {
+                    Board[column, 0] = new Pieces.Knight(new Point(column, 0), true);
+                    Board[column, 7] = new Pieces.Knight(new Point(column, 7), false);
+                } else if (piece.Equals("Bishop"))
+                {
+                    Board[column, 0] = new Pieces.Bishop(new Point(column, 0), true);
+                    Board[column, 7] = new Pieces.Bishop(new Point(column, 7), false);
+                } else if (piece.Equals("Queen"))
+                {
+                    Board[column, 0] = new Pieces.Queen(new Point(column, 0), true);
+                    Board[column, 7] = new Pieces.Queen(new Point(column, 7), false);
+                } else if (piece.Equals("King"))
+                {
+                    Board[column, 0] = new Pieces.King(new Point(column, 0), true);
+                    Board[column, 7] = new Pieces.King(new Point(column, 7), false);
+                }
+                column++;
+            }
+        }
+
+        //Ensures that the King is in between two rooks
+        public void EnsureKing()
+        {
+            var king = Board.OfType<Pieces.Piece>().FirstOrDefault(p => p is Pieces.King);
+            var rooks = Board.OfType<Pieces.Rook>().Where(r => r.IsWhite == true);
+
+            if (king is null || rooks.Count() != 2) return;
+
+            var rook1 = rooks.First();
+            var rook2 = rooks.Skip(1).First();
+
+            if (Math.Abs(rook1.Position.X - king.Position.X) <= 1 && Math.Abs(rook2.Position.X - king.Position.X) <= 1) return;
+
+            var temp = Board[rook1.Position.X, rook1.Position.Y];
+            Board[rook1.Position.X, rook1.Position.Y] = king;
+            Board[king.Position.X, king.Position.Y] = temp;
+        }
+
+        //Ensures Bishops are on opposite colored squares
+        public void EnsureBishops()
+        {
+            var bishops = Board.OfType<Pieces.Bishop>();
+
+            if (bishops.Count() != 2) return;
+
+            var bishop1 = bishops.First();
+            var bishop2 = bishops.Skip(1).First();
+
+            while ((bishop1.Position.X % 2) == (bishop2.Position.X % 2))
+            {
+                var temp = Board[bishop1.Position.X, bishop1.Position.Y];
+                Board[bishop1.Position.X, bishop1.Position.Y] = Board[bishop2.Position.X, bishop2.Position.Y];
+                Board[bishop2.Position.X, bishop2.Position.Y] = temp;
+            }
         }
 
         /// <summary>

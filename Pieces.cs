@@ -10,7 +10,7 @@ namespace Chess.Pieces
         public abstract char SymbolLetter { get; }
         public abstract char SymbolSpecial { get; }
         public abstract double Value { get; }
-        public abstract bool IsWhite { get; }
+        public abstract bool IsWhite { get; set; }
         public abstract Point Position { get; protected set; }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace Chess.Pieces
         public override char SymbolSpecial { get; }
         // King should not contribute to overall board value, as it always present
         public override double Value => 0;
-        public override bool IsWhite { get; }
+        public override bool IsWhite { get; set; }
         public override Point Position { get; protected set; }
         public System.Windows.Point Point { get; }
         public bool V { get; }
@@ -105,7 +105,7 @@ namespace Chess.Pieces
         public override char SymbolLetter => 'Q';
         public override char SymbolSpecial { get; }
         public override double Value => 9.5;
-        public override bool IsWhite { get; }
+        public override bool IsWhite { get; set; }
         public override Point Position { get; protected set; }
         public System.Windows.Point Point { get; }
         public bool V { get; }
@@ -281,7 +281,7 @@ namespace Chess.Pieces
         public override char SymbolLetter => 'R';
         public override char SymbolSpecial { get; }
         public override double Value => 5.63;
-        public override bool IsWhite { get; }
+        public override bool IsWhite { get; set; }
         public override Point Position { get; protected set; }
         public System.Windows.Point Point { get; }
         public bool V { get; }
@@ -392,7 +392,7 @@ namespace Chess.Pieces
         public override char SymbolLetter => 'B';
         public override char SymbolSpecial { get; }
         public override double Value => 3.33;
-        public override bool IsWhite { get; }
+        public override bool IsWhite { get; set; }
         public override Point Position { get; protected set; }
         public System.Windows.Point Point { get; }
         public bool V { get; }
@@ -505,7 +505,7 @@ namespace Chess.Pieces
         public override char SymbolLetter => 'N';
         public override char SymbolSpecial { get; }
         public override double Value => 3.05;
-        public override bool IsWhite { get; }
+        public override bool IsWhite { get; set; }
         public override Point Position { get; protected set; }
         public System.Windows.Point Point { get; }
         public bool V { get; }
@@ -555,7 +555,7 @@ namespace Chess.Pieces
         public override char SymbolLetter => 'P';
         public override char SymbolSpecial { get; }
         public override double Value => 1;
-        public override bool IsWhite { get; }
+        public override bool IsWhite { get; set; }
         public override Point Position { get; protected set; }
 
         public Pawn(Point position, bool isWhite)

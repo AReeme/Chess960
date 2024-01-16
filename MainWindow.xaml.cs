@@ -613,19 +613,25 @@ namespace Chess
             var pieces = new List<Pieces.Piece>
             {
                 new Rook(new Point(0, 0), true),
-                new Knight(new Point(0, 0), true),
-                new Bishop(new Point(0, 0), true),
-                new Queen(new Point(0, 0), true),
-                new King(new Point(0, 0), true),
-                new Bishop(new Point(0, 0), true),
-                new Knight(new Point(0, 0), true),
-                new Rook(new Point(0, 0), true)
+                new Knight(new Point(1, 0), true),
+                new Bishop(new Point(2, 0), true),
+                new Queen(new Point(3, 0), true),
+                new King(new Point(4, 0), true),
+                new Bishop(new Point(5, 0), true),
+                new Knight(new Point(6, 0), true),
+                new Rook(new Point(7, 0), true)
             };
+
+            for (int i = 0; i < pieces.Count; i++)
+            {
+                pieces[i].IsWhite = true;
+            }
 
             pieces.Shuffle();
             PlacePieces(pieces);
-            EnsureKing();
-            EnsureBishops();
+
+            //EnsureKing();
+            //EnsureBishops();
 
             currentBestMove = null;
             manuallyEvaluating = false;
@@ -995,6 +1001,7 @@ namespace Chess
             foreach (Piece piece in pieces) 
             {
                 if (piece is Pieces.Pawn) continue;
+                if (column >= 8) break;
                 game.Board[column++, 0] = piece;
             }
         }
@@ -1003,7 +1010,7 @@ namespace Chess
         public void EnsureKing()
         {
             var king = game.Board.OfType<Pieces.Piece>().FirstOrDefault(p => p is Pieces.King);
-            var rooks = game.Board.OfType<Pieces.Rook>();
+            var rooks = game.Board.OfType<Pieces.Rook>().Where(r => r.IsWhite == false);
 
             if (king is null || rooks.Count() != 2) return;
 
